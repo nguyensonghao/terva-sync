@@ -1,0 +1,16 @@
+{
+  "name": "terva-sync",
+  "version": "1.0.0",
+  "description": "script sync data from SP",
+  "main": "connection.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "nguyensonghao974@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "mongodb": "^2.2.30",
+    "request": "^2.88.0"
+  }
+}
