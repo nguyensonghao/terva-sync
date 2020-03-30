@@ -38,8 +38,8 @@ const getListFile = (dir, filelist, rootPath, level) => {
                 statusSync: 0,
                 level: level
             })
-
-            let path = `${rootPath}/${file}`;
+            
+            let path = rootPath ? `${rootPath}/${file}` : file;
       		filelist = getListFile(f, filelist, path, level + 1);
     	} else {
     		filelist.push({
@@ -60,9 +60,17 @@ const sendRequestParallel = (listFile, accessToken) => {
         listFile.forEach(file => {
             if (file) {
                 if (file.isFolder) {
-                    listPromise.push(Helper.createFolder(`${file.path}/${file.name}`, file._id, accessToken))
+                    if (file.path) {
+                        listPromise.push(Helper.createFolder(`${file.path}/${file.name}`, file._id, accessToken))
+                    } else {
+                        listPromise.push(Helper.createFolder(`${file.name}`, file._id, accessToken))
+                    }                    
                 } else {
-                    listPromise.push(Helper.uploadFile(`./${file.path}/${file.name}`, file.path, file.name, file._id, accessToken));
+                    if (file.path) {
+                        listPromise.push(Helper.uploadFile(`./${FOLDER_UPLOAD_NAME}/${file.path}/${file.name}`, file.path, file.name, file._id, accessToken));
+                    } else {
+                        listPromise.push(Helper.uploadFile(`./${FOLDER_UPLOAD_NAME}/${file.name}`, file.path, file.name, file._id, accessToken));
+                    }
                 }
             }
         })
@@ -154,7 +162,7 @@ const updateStatusUpload = (item) => {
 
 (async() => {
     try {
-        let listFile = getListFile(DIR_FILE, [], FOLDER_UPLOAD_NAME, 0);
+        let listFile = getListFile(DIR_FILE, [], null, 0);
         await insertAllFile(listFile);
 
         let listLevel = await getListLevel();        

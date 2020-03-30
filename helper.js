@@ -136,7 +136,6 @@ const createFolder = (path, id, accessToken) => {
                 reject(error);
             } else {
                 let data = JSON.parse(body);
-                console.log(body);
                 if (data.error) {
                     resolve({
                         status: false,
