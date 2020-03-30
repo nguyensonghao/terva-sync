@@ -135,28 +135,36 @@ const createFolder = (path, id, accessToken) => {
             if (error) {
                 reject(error);
             } else {
-                let data = JSON.parse(body);
-                if (data.error) {
-                    resolve({
-                        status: false,
-                        id: id
-                    })
-                    // reject(new Error(data.error.message.value));
-                } else {
-                    if (data.error_description) {
-                        // reject(new Error(data.error_description));
+                try {
+                    let data = JSON.parse(body);
+                    if (data.error) {
                         resolve({
                             status: false,
                             id: id
                         })
+                        // reject(new Error(data.error.message.value));
                     } else {
-                        // resolve(data.d);
-                        resolve({
-                            status: true,
-                            id: id
-                        })
-                    }
-                }
+                        if (data.error_description) {
+                            // reject(new Error(data.error_description));
+                            resolve({
+                                status: false,
+                                id: id
+                            })
+                        } else {
+                            // resolve(data.d);
+                            resolve({
+                                status: true,
+                                id: id
+                            })
+                        }
+                    }   
+                } catch (error) {
+                    console.log(body);
+                    resolve({
+                        status: true,
+                        id: id
+                    })                    
+                }                
             }
         })
     })
