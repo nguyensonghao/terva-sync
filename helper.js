@@ -115,117 +115,131 @@ const convertInformationFile = (result, ROOT_FOLDER_SP, mainMetaData) => {
 
 const createFolder = (path, id, accessToken) => {
     return new Promise((resolve, reject) => {
-        const options = {
-            method: 'POST',
-            url: `${SP_URL}/_api/web/GetFolderByServerRelativeUrl('Land Files')/folders?$expand=ListItemAllFields`,
-            headers: {
-                'authorization': `Bearer ${accessToken}`,
-                'content-type': 'application/json;odata=verbose',
-                'accept': 'application/json;odata=verbose'
-            },
-            body: JSON.stringify({
-                "__metadata": {
-                    "type": "SP.Folder"
+        try {
+            const options = {
+                method: 'POST',
+                url: `${SP_URL}/_api/web/GetFolderByServerRelativeUrl('Land Files')/folders?$expand=ListItemAllFields`,
+                headers: {
+                    'authorization': `Bearer ${accessToken}`,
+                    'content-type': 'application/json;odata=verbose',
+                    'accept': 'application/json;odata=verbose'
                 },
-                "ServerRelativeUrl": `${DOCUMENT_LIBRARY}/${path}`
-            })
-        }
-        
-        request(options, function (error, response, body) {
-            try {
-                if (error) {
-                    reject(error);
-                } else {
-                    let data = JSON.parse(body);
-                    if (data.error) {
-                        resolve({
-                            status: false,
-                            id: id
-                        })
+                body: JSON.stringify({
+                    "__metadata": {
+                        "type": "SP.Folder"
+                    },
+                    "ServerRelativeUrl": `${DOCUMENT_LIBRARY}/${path}`
+                })
+            }
+            
+            request(options, function (error, response, body) {
+                try {
+                    if (error) {
+                        reject(error);
                     } else {
-                        if (data.error_description) {
-                            console.log(data.error_description);
+                        let data = JSON.parse(body);
+                        if (data.error) {
                             resolve({
                                 status: false,
                                 id: id
                             })
                         } else {
-                            resolve({
-                                status: true,
-                                id: id
-                            })
-                        }
-                    }
-                }   
-            } catch (error) {
-                console.log(error.message);
-                resolve({
-                    status: false,
-                    id: id
-                })
-            }            
-        })
-    })
-}
-
-const uploadFile = (localPath, folderPath, fileName, id, accessToken) => {
-    return new Promise((resolve, reject) => {
-        let url = `${SP_URL}/_api/web/GetFolderByServerRelativeUrl('${DOCUMENT_LIBRARY}/${folderPath}')/Files/add(url='${fileName}',overwrite=true)?$expand=ListItemAllFields`;
-        if (!folderPath) {
-            url = `${SP_URL}/_api/web/GetFolderByServerRelativeUrl('${DOCUMENT_LIBRARY}/')/Files/add(url='${fileName}',overwrite=true)?$expand=ListItemAllFields`;
-        }
-        
-        fs.readFile(localPath, (err, data) => {
-            const options = {
-                method: 'POST',
-                url: url,
-                headers: {            
-                    'authorization': `Bearer ${accessToken}`,
-                    'content-type': 'application/json;odata=verbose',
-                    'accept': 'application/json;odata=verbose'
-                },
-                body: data
-            }
-        
-            request(options, (error, response, body) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    if (!body) {
-                        resolve(true);
-                    } else {
-                        try {
-                            let data = JSON.parse(body);
-                            if (data.error) {
+                            if (data.error_description) {
+                                console.log(data.error_description);
                                 resolve({
                                     status: false,
                                     id: id
                                 })
                             } else {
-                                if (data.error_description) {
-                                    console.log(data.error_description);
+                                resolve({
+                                    status: true,
+                                    id: id
+                                })
+                            }
+                        }
+                    }   
+                } catch (error) {
+                    console.log(error.message);
+                    resolve({
+                        status: false,
+                        id: id
+                    })
+                }            
+            })   
+        } catch (error) {
+            resolve({
+                status: false,
+                id: id
+            })
+        }        
+    })
+}
+
+const uploadFile = (localPath, folderPath, fileName, id, accessToken) => {
+    return new Promise((resolve, reject) => {
+        try {
+            let url = `${SP_URL}/_api/web/GetFolderByServerRelativeUrl('${DOCUMENT_LIBRARY}/${folderPath}')/Files/add(url='${fileName}',overwrite=true)?$expand=ListItemAllFields`;
+            if (!folderPath) {
+                url = `${SP_URL}/_api/web/GetFolderByServerRelativeUrl('${DOCUMENT_LIBRARY}/')/Files/add(url='${fileName}',overwrite=true)?$expand=ListItemAllFields`;
+            }
+            
+            fs.readFile(localPath, (err, data) => {
+                const options = {
+                    method: 'POST',
+                    url: url,
+                    headers: {            
+                        'authorization': `Bearer ${accessToken}`,
+                        'content-type': 'application/json;odata=verbose',
+                        'accept': 'application/json;odata=verbose'
+                    },
+                    body: data
+                }
+            
+                request(options, (error, response, body) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        if (!body) {
+                            resolve(true);
+                        } else {
+                            try {
+                                let data = JSON.parse(body);
+                                if (data.error) {
                                     resolve({
                                         status: false,
                                         id: id
                                     })
                                 } else {
-                                    resolve({
-                                        status: true,
-                                        id: id
-                                    })
-                                }
-                            }   
-                        } catch (error) {
-                            console.log(error.message);
-                            resolve({
-                                status: false,
-                                id: id
-                            })
-                        }                            
-                    }   
-                }                                     
+                                    if (data.error_description) {
+                                        console.log(data.error_description);
+                                        resolve({
+                                            status: false,
+                                            id: id
+                                        })
+                                    } else {
+                                        resolve({
+                                            status: true,
+                                            id: id
+                                        })
+                                    }
+                                }   
+                            } catch (error) {
+                                console.log(error.message);
+                                resolve({
+                                    status: false,
+                                    id: id
+                                })
+                            }                            
+                        }   
+                    }                                     
+                })
+            })     
+        } catch (error) {
+            resolve({
+                status: false,
+                id: id
             })
-        })    
+        }          
     })    
 }
 
