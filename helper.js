@@ -132,32 +132,38 @@ const createFolder = (path, id, accessToken) => {
         }
         
         request(options, function (error, response, body) {
-            if (error) {
-                reject(error);
-            } else {
-                let data = JSON.parse(body);
-                if (data.error) {
-                    resolve({
-                        status: false,
-                        id: id
-                    })
-                    // reject(new Error(data.error.message.value));
+            try {
+                if (error) {
+                    reject(error);
                 } else {
-                    if (data.error_description) {
-                        // reject(new Error(data.error_description));
+                    let data = JSON.parse(body);
+                    if (data.error) {
                         resolve({
                             status: false,
                             id: id
                         })
                     } else {
-                        // resolve(data.d);
-                        resolve({
-                            status: true,
-                            id: id
-                        })
+                        if (data.error_description) {
+                            console.log(data.error_description);
+                            resolve({
+                                status: false,
+                                id: id
+                            })
+                        } else {
+                            resolve({
+                                status: true,
+                                id: id
+                            })
+                        }
                     }
-                }
-            }
+                }   
+            } catch (error) {
+                console.log(error.message);
+                resolve({
+                    status: false,
+                    id: id
+                })
+            }            
         })
     })
 }
@@ -191,20 +197,18 @@ const uploadFile = (localPath, folderPath, fileName, id, accessToken) => {
                         try {
                             let data = JSON.parse(body);
                             if (data.error) {
-                                // reject(new Error(data.error.message.value));
                                 resolve({
                                     status: false,
                                     id: id
                                 })
                             } else {
                                 if (data.error_description) {
-                                    // reject(new Error(data.error_description));
+                                    console.log(data.error_description);
                                     resolve({
                                         status: false,
                                         id: id
                                     })
                                 } else {
-                                    // resolve(data.d);
                                     resolve({
                                         status: true,
                                         id: id
@@ -212,7 +216,7 @@ const uploadFile = (localPath, folderPath, fileName, id, accessToken) => {
                                 }
                             }   
                         } catch (error) {
-                            // reject(error);
+                            console.log(error.message);
                             resolve({
                                 status: false,
                                 id: id

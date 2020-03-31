@@ -21,7 +21,7 @@ const ObjectID = require('mongodb').ObjectID;
 
 const connection = require('./connection');
 const Helper = require('./helper');
-const FOLDER_UPLOAD_NAME = "UploadTest";
+const FOLDER_UPLOAD_NAME = "Contacts";
 const DIR_FILE = `${__dirname}/${FOLDER_UPLOAD_NAME}`;
 const NUMBER_REQUEST_PARALLEL = 5;
 
